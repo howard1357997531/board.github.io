@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     "corsheaders"
 ]
 
+if not DEBUG:
+    CSRF_TRUSTED_ORIGINS = ['https://web-production-3185.up.railway.app']
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",

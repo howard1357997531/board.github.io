@@ -109,11 +109,17 @@ function Navbar(props) {
                 >
                   <Typography textAlign="center">我的發文</Typography>
                 </MenuItem>
-              ) : (
-                <MenuItem onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">發文</Typography>
+              ) : null}
+              {props.token.mytoken ? (
+                <MenuItem
+                  onClick={() => {
+                    setAnchorElNav(null);
+                    history("/my-save-article");
+                  }}
+                >
+                  <Typography textAlign="center">我的珍藏</Typography>
                 </MenuItem>
-              )}
+              ) : null}
               {props.token.mytoken ? (
                 <MenuItem
                   onClick={() => {
@@ -123,7 +129,11 @@ function Navbar(props) {
                 >
                   <Typography textAlign="center">發文</Typography>
                 </MenuItem>
-              ) : null}
+              ) : (
+                <MenuItem onClick={handleCloseNavMenu}>
+                  <Typography textAlign="center">發文</Typography>
+                </MenuItem>
+              )}
             </Menu>
           </Box>
           <ChatRoundedIcon
@@ -163,9 +173,20 @@ function Navbar(props) {
                   setAnchorElNav(null);
                   history("/myarticle");
                 }}
-                sx={{ my: 2, color: "white", display: "block" }}
+                sx={{ my: 2, mr: 1, color: "white", display: "block" }}
               >
                 我的發文
+              </Button>
+            ) : null}
+            {props.token.mytoken ? (
+              <Button
+                onClick={() => {
+                  setAnchorElNav(null);
+                  history("/my-save-article");
+                }}
+                sx={{ my: 2, color: "white", display: "block" }}
+              >
+                我的珍藏
               </Button>
             ) : null}
             {props.token.mytoken ? (

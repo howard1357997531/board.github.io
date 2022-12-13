@@ -16,7 +16,6 @@ class Profile(models.Model):
     def __str__(self):
         return f'{self.user}'
 
-
 class Article(models.Model):
     user = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name='article', null=True, blank=True)
@@ -29,5 +28,21 @@ class Article(models.Model):
         return self.title
 
 class Like(models.Model):
-    user = models.ForeignKey(Profile,on_delete=models.CASCADE)
-    article = models.ForeignKey(Article,on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+
+class Comment(models.Model):
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    description = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.user)
+
+class Save_article(models.Model):
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.user)

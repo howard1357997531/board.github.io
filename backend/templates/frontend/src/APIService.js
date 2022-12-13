@@ -22,6 +22,7 @@ export default class APIService {
       })
       .catch((res) => console.log(res));
   }
+
   static GetArticleList(token) {
     if (token) {
       return fetch("/api/articleList/", {
@@ -74,6 +75,39 @@ export default class APIService {
 
   static DeleteLike(body, token, user_likeId_for_thisArticle) {
     return fetch(`/api/like/${user_likeId_for_thisArticle}/`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
+  }
+
+  static CreateComment(body, token) {
+    return fetch("/api/comment/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${token}`,
+      },
+      body: JSON.stringify(body),
+    }).then((res) => res.json());
+  }
+
+  static CreateSaveArticle(body, token) {
+    return fetch("/api/save_article/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${token}`,
+      },
+      body: JSON.stringify(body),
+    }).then((res) => res.json());
+  }
+
+  static DeleteSaveArticle(body, token, user_saveId_for_thisArticle) {
+    return fetch(`/api/save_article/${user_saveId_for_thisArticle}/`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

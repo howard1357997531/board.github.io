@@ -7,6 +7,9 @@ import swal from "sweetalert";
 import { Button, IconButton, Typography, Grid } from "@mui/material";
 import FavoriteOutlinedIcon from "@mui/icons-material/FavoriteOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
+import ChatIcon from "@mui/icons-material/Chat";
+import BookmarkAddIcon from "@mui/icons-material/BookmarkAdd";
+import BookmarkAddOutlinedIcon from "@mui/icons-material/BookmarkAddOutlined";
 import { useNavigate } from "react-router-dom";
 
 function MyArticleList(props) {
@@ -109,7 +112,6 @@ function MyArticleList(props) {
                     <Grid item xs={8} md={10}>
                       <IconButton
                         size="medium"
-                        sx={{ mr: 1 }}
                         onClick={() => {
                           props.updateLike(article.article_id);
                         }}
@@ -123,10 +125,47 @@ function MyArticleList(props) {
                           />
                         )}
                       </IconButton>
-                      <Typography display="inline" color="error">
+                      <Typography display="inline" sx={{ mr: 1 }} color="error">
                         {article.likes}
                       </Typography>
+                      <IconButton
+                        size="medium"
+                        onClick={() => {
+                          props.getCommentID(article.article_id);
+                          history("/comment");
+                        }}
+                      >
+                        <ChatIcon size="medium" color="primary" />
+                      </IconButton>
+                      <Typography
+                        display="inline"
+                        color="primary"
+                        sx={{ mr: 1 }}
+                      >
+                        {article.comment.length}
+                      </Typography>
+                      <IconButton
+                        size="medium"
+                        onClick={() => {
+                          props.updateSave(article.article_id);
+                        }}
+                      >
+                        {article.user_is_saved ? (
+                          <BookmarkAddIcon size="medium" color="warning" />
+                        ) : (
+                          <BookmarkAddOutlinedIcon
+                            size="medium"
+                            color="warning"
+                          />
+                        )}
+                      </IconButton>
+                      {article.user_is_saved ? (
+                        <Typography display="inline" sx={{ color: "#ed6c02" }}>
+                          已儲存
+                        </Typography>
+                      ) : null}
                     </Grid>
+
                     <Grid item xs={2} md={1}>
                       <Button
                         variant="contained"

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Article, Like
+from .models import Profile, Article, Like, Comment, Save_article
 from rest_framework.authtoken.admin import TokenAdmin
 
 TokenAdmin.raw_id_fields = ['user']
@@ -16,4 +16,12 @@ class ArticleAdmin(admin.ModelAdmin):
 
 @admin.register(Like)
 class LikeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'article')
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('id','user','article','created_at')
+
+@admin.register(Save_article)
+class SaveArticleAdmin(admin.ModelAdmin):
     list_display = ('user', 'article')

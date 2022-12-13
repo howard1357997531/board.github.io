@@ -1,15 +1,17 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from .serializers import ArticleSerializer, ProfileSerializer, LikeSerializer, RegisterSerializer
-from .models import Article, Profile, Like
+from .serializers import (ArticleSerializer, ProfileSerializer, LikeSerializer, CommentSerializer,
+                        Save_articleSerializer, RegisterSerializer)
+from .models import Article, Profile, Like, Comment, Save_article
+from . import models
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from rest_framework import generics, mixins
+from rest_framework import generics, mixins, status
 
 
 class CustomAuthToken(ObtainAuthToken):
@@ -33,7 +35,6 @@ class RegisterList(mixins.CreateModelMixin, generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
-
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
@@ -56,6 +57,20 @@ class GetArticleList(APIView):
         if request.user.is_authenticated:
             for article in articles: 
                 like_id = Like.objects.filter(user=request.user.profile, article=article.id)
+                if Comment.objects.filter(article__id=article.id).exists() :
+                    comment = list(Comment.objects.filter(article__id=article.id).order_by('-created_at').values())
+                    for com in comment:
+                        username = Profile.objects.get(id=com['user_id']).username
+                        first_name = Profile.objects.get(id=com['user_id']).first_name
+                        last_name = Profile.objects.get(id=com['user_id']).last_name
+                        com.update({'username': username})
+                        com.update({'first_name': first_name})
+                        com.update({'last_name': last_name})
+                        com.update({'created_at': com['created_at'].strftime('%Y/%m/%d %H:%M:%S')})
+                else:
+                    comment = ""
+                article_is_saved = Save_article.objects.filter(user=request.user.profile, article=article.id).exists()
+                saved_article_id = Save_article.objects.filter(user=request.user.profile, article=article.id)
                 temp_output = {
                     'user_id': article.user.id,
                     'article_id': article.id,
@@ -67,11 +82,26 @@ class GetArticleList(APIView):
                     'likes':  article.likes,
                     'created_at':  article.created_at.strftime('%Y/%m/%d %H:%M:%S'),
                     'user_is_liked':  Like.objects.filter(user=request.user.profile, article=article.id).exists(),
+                    'user_is_saved':  article_is_saved,
                     'user_likeId_for_thisArticle':  like_id.first().id if like_id.first() else "",
+                    'user_saveId_for_thisArticle': saved_article_id.first().id if saved_article_id.first() else "",
+                    'comment': comment
                     }
                 output.append(temp_output)
         else:
             for article in articles: 
+                if Comment.objects.filter(article__id=article.id).exists() :
+                    comment = list(Comment.objects.filter(article__id=article.id).order_by('-created_at').values())
+                    for com in comment:
+                        username = Profile.objects.get(id=com['user_id']).username
+                        first_name = Profile.objects.get(id=com['user_id']).first_name
+                        last_name = Profile.objects.get(id=com['user_id']).last_name
+                        com.update({'username': username})
+                        com.update({'first_name': first_name})
+                        com.update({'last_name': last_name})
+                        com.update({'created_at': com['created_at'].strftime('%Y/%m/%d %H:%M:%S')})
+                else:
+                    comment = ""
                 temp_output = {
                     'user_id': article.user.id,
                     'article_id': article.id,
@@ -82,9 +112,9 @@ class GetArticleList(APIView):
                     'description':  article.description,
                     'likes':  article.likes,
                     'created_at':  article.created_at.strftime('%Y/%m/%d %H:%M:%S'),
+                    'comment': comment
                     }
                 output.append(temp_output)
-
         return Response(output)
 
 class LikeList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
@@ -121,6 +151,20 @@ class LikeDetail(mixins.RetrieveModelMixin, mixins.DestroyModelMixin, generics.G
             article.likes -= 1
         article.save()
         return self.destroy(request, *args, **kwargs)
+
+class CommentGenericView(generics.GenericAPIView, mixins.CreateModelMixin):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+    premission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [SessionAuthentication, BasicAuthentication, TokenAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+    
+
+class SaveArticle(viewsets.ModelViewSet):
+    queryset = Save_article.objects.all().order_by('-id')
+    serializer_class = Save_articleSerializer
 
 def frontend(request):
     return render(request, 'frontend/index.html', locals())

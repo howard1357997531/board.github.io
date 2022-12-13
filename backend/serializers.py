@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.views import Token
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
-from .models import Article, Profile, Like
+from .models import Article, Profile, Like, Comment, Save_article
 
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,6 +21,16 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = '__all__'
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+class Save_articleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Save_article
+        fields = "__all__"
             
 class RegisterSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(write_only=True, required=True)
